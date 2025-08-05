@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Online Memory-Spiel</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <h1>Memory-Spiel</h1>
+    
+    <div id="setup-container">
+        <h2>Spiel-Setup</h2>
+        <form id="setup-form">
+            <div>
+                <label for="player1-name">Name Spieler 1:</label>
+                <input type="text" id="player1-name" value="Spieler 1" required>
+            </div>
+            <div>
+                <label for="player2-name">Name Spieler 2:</label>
+                <input type="text" id="player2-name" value="Spieler 2" required>
+            </div>
+            <div>
+                <label for="pair-count">Anzahl der Paare:</label>
+                <select id="pair-count">
+                    <option value="8">8 Paare</option>
+                    <option value="12">12 Paare</option>
+                    <option value="16">16 Paare</option>
+                    <option value="20">20 Paare</option>
+                    <option value="25">25 Paare</option>
+                    <option value="30">30 Paare</option>
+                </select>
+            </div>
+            
+            <hr>
+
+            <div>
+                <label for="image-upload">Laden Sie die genaue Anzahl an Bildern hoch, die der Paaranzahl entspricht.</label>
+                <input type="file" id="image-upload" name="memoryImages" multiple accept="image/*" required>
+            </div>
+            
+            <button type="submit">Spiel starten</button>
+        </form>
+    </div>
+    
+    <div id="game-container" style="display: none;">
+        <div class="score-board">
+            <p id="player-turn">...</p>
+            <p><span id="name1"></span>: <span id="score1">0</span></p>
+            <p><span id="name2"></span>: <span id="score2">0</span></p>
+        </div>
+        <div id="game-board" class="game-board">
+            </div>
+    </div>
+    
+    <div id="effect-message"></div>
+    <div id="end-game-modal" class="modal">
+        <div class="modal-content">
+            <h2 id="end-game-title"></h2>
+            <p id="final-score"></p>
+            <button id="restart-button">Neues Spiel</button>
+        </div>
+    </div>
+    <script src="script.js"></script>
+</body>
+</html>
