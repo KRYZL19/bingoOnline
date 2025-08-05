@@ -3,8 +3,376 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Online Memory-Spiel</title>
-    <link rel="stylesheet" href="style.css">
+    <title>Offline Memory-Spiel</title>
+    
+    <style>
+        /* Globale Stile und Layout */
+        body {
+            font-family: 'Segoe UI', Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start;
+            min-height: 100vh;
+            background-color: #f0f4f8;
+            margin: 0;
+            padding: 2vw;
+            color: #333;
+        }
+
+        h1 {
+            color: #4a4a4a;
+            font-size: 8vw;
+            margin-bottom: 2vw;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
+        }
+
+        @media (min-width: 600px) {
+            h1 {
+                font-size: 3em;
+            }
+        }
+
+        /* Animationen */
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+
+        @keyframes rainbow-text {
+            0% { background-position: 0% 50%; }
+            100% { background-position: 200% 50%; }
+        }
+
+        /* --- Spiel-Setup-Menü --- */
+        #setup-container {
+            background-color: #fff;
+            padding: 3vw;
+            border-radius: 15px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            width: 90%;
+            max-width: 450px;
+            margin-top: 5vw;
+            border: 1px solid #e0e0e0;
+        }
+
+        #setup-container h2 {
+            color: #4a4a4a;
+            margin-bottom: 25px;
+            font-size: 6vw;
+            border-bottom: 3px solid #6c5ce7;
+            padding-bottom: 15px;
+        }
+
+        @media (min-width: 600px) {
+            #setup-container h2 {
+                font-size: 2.2em;
+            }
+        }
+
+        #setup-form div {
+            margin-bottom: 20px;
+            text-align: left;
+        }
+
+        #setup-form label {
+            display: block;
+            font-size: 3vw;
+            color: #555;
+            margin-bottom: 8px;
+            font-weight: 600;
+        }
+
+        @media (min-width: 600px) {
+            #setup-form label {
+                font-size: 1.1em;
+            }
+        }
+
+        #setup-form input[type="text"],
+        #setup-form select {
+            width: 100%;
+            padding: 2vw;
+            border: 2px solid #ddd;
+            border-radius: 10px;
+            font-size: 3vw;
+            box-sizing: border-box;
+            transition: border-color 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        @media (min-width: 600px) {
+            #setup-form input[type="text"],
+            #setup-form select {
+                padding: 12px;
+                font-size: 1em;
+            }
+        }
+
+        #setup-form input[type="text"]:focus,
+        #setup-form select:focus {
+            outline: none;
+            border-color: #6c5ce7;
+            box-shadow: 0 0 8px rgba(108, 92, 231, 0.2);
+        }
+
+        #setup-form button {
+            width: 100%;
+            padding: 3vw;
+            background-color: #6c5ce7;
+            color: #fff;
+            border: none;
+            border-radius: 10px;
+            font-size: 4vw;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background-color 0.3s ease, transform 0.2s ease;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        #setup-form button:hover {
+            background-color: #5c4ce3;
+            transform: translateY(-3px);
+        }
+
+        #setup-form button:active {
+            background-color: #4b3acb;
+            transform: translateY(0);
+        }
+
+        /* --- Spiel-Interface und Score-Board --- */
+        #game-container {
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .score-board {
+            display: flex;
+            justify-content: space-around;
+            width: 90%;
+            max-width: 600px;
+            margin-bottom: 30px;
+            font-size: 4vw;
+            background-color: #fff;
+            padding: 15px;
+            border-radius: 15px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+
+        @media (min-width: 600px) {
+            .score-board {
+                font-size: 1.3em;
+            }
+        }
+
+        .score-board p {
+            margin: 0;
+            font-weight: 600;
+            color: #555;
+        }
+
+        #player-turn {
+            color: #6c5ce7;
+            font-weight: bold;
+            animation: pulse 1.5s infinite;
+        }
+
+        /* --- Spielfeld und Karten --- */
+        .game-board {
+            display: grid;
+            grid-gap: 1.5vw;
+            perspective: 1000px;
+            padding: 2vw;
+            background-color: #fff;
+            border-radius: 15px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            margin-top: 20px;
+        }
+
+        .memory-card {
+            width: 18vw;
+            height: 18vw;
+            position: relative;
+            transform-style: preserve-3d;
+            transition: transform 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            cursor: pointer;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+        }
+
+        @media (min-width: 600px) {
+            .memory-card {
+                width: 100px;
+                height: 100px;
+            }
+        }
+
+        .memory-card.flipped {
+            transform: rotateY(180deg);
+            cursor: default;
+        }
+
+        .memory-card:hover:not(.flipped) {
+            transform: scale(1.05);
+        }
+
+        .card-face {
+            width: 100%;
+            height: 100%;
+            position: absolute;
+            backface-visibility: hidden;
+            border-radius: 10px;
+            border: 3px solid #6c5ce7;
+        }
+
+        .card-back {
+            background: linear-gradient(145deg, #7b68ee, #6c5ce7);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+            font-size: 7vw;
+            font-weight: bold;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.2);
+        }
+
+        @media (min-width: 600px) {
+            .card-back {
+                font-size: 2.5em;
+            }
+        }
+
+        .card-front {
+            transform: rotateY(180deg);
+            background-size: cover;
+            background-position: center;
+            border: 3px solid #fff;
+        }
+
+        /* --- Stile für die Effekt-Nachrichten --- */
+        #effect-message {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 10vw;
+            font-weight: bold;
+            color: #4CAF50;
+            opacity: 0;
+            pointer-events: none;
+            transition: all 0.5s ease-in-out;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+            z-index: 1000;
+        }
+
+        @media (min-width: 600px) {
+            #effect-message {
+                font-size: 3em;
+            }
+        }
+
+        #effect-message.show {
+            opacity: 1;
+            transform: translate(-50%, -50%) scale(1.2);
+        }
+
+        #effect-message.golden {
+            color: gold;
+            text-shadow: 0 0 10px gold, 0 0 20px goldenrod;
+        }
+
+        #effect-message.rainbow {
+            animation: rainbow-text 1.5s infinite linear, pulse 1.5s infinite;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-size: 200% 200%;
+            background-image: linear-gradient(to right, red, orange, yellow, green, blue, indigo, violet, red);
+        }
+
+        /* --- Modal-Stile für den Endspielstand --- */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1001;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0,0,0,0.6);
+            backdrop-filter: blur(5px);
+            transition: opacity 0.3s ease;
+            opacity: 0;
+        }
+
+        .modal.show-modal {
+            display: block;
+            opacity: 1;
+        }
+
+        .modal-content {
+            background-color: #fff;
+            margin: 15% auto;
+            padding: 30px;
+            border: 1px solid #ddd;
+            width: 90%;
+            max-width: 500px;
+            border-radius: 20px;
+            text-align: center;
+            box-shadow: 0 8px 16px rgba(0,0,0,0.2);
+            transform: translateY(-50px);
+            transition: transform 0.5s ease-out;
+        }
+
+        .modal.show-modal .modal-content {
+            transform: translateY(0);
+        }
+
+        .modal-content h2 {
+            font-size: 6vw;
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        .modal-content h3 {
+            font-size: 5vw;
+            color: #6c5ce7;
+            margin-bottom: 15px;
+        }
+
+        .modal-content p {
+            font-size: 4vw;
+            color: #555;
+            line-height: 1.5;
+        }
+
+        .modal-content button {
+            padding: 1vw 2vw;
+            margin-top: 25px;
+            background-color: #6c5ce7;
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 4vw;
+            cursor: pointer;
+            transition: background-color 0.3s, transform 0.2s;
+        }
+
+        .modal-content button:hover {
+            background-color: #5c4ce3;
+            transform: translateY(-2px);
+        }
+
+        @media (min-width: 600px) {
+            .modal-content h2 { font-size: 2.5em; }
+            .modal-content h3 { font-size: 2em; }
+            .modal-content p { font-size: 1.2em; }
+            .modal-content button { font-size: 1.2em; padding: 10px 20px; }
+        }
+    </style>
 </head>
 <body>
     <h1>Memory-Spiel</h1>
@@ -50,7 +418,7 @@
             <p><span id="name2"></span>: <span id="score2">0</span></p>
         </div>
         <div id="game-board" class="game-board">
-            </div>
+        </div>
     </div>
     
     <div id="effect-message"></div>
@@ -61,6 +429,290 @@
             <button id="restart-button">Neues Spiel</button>
         </div>
     </div>
-    <script src="script.js"></script>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const setupContainer = document.getElementById('setup-container');
+            const gameContainer = document.getElementById('game-container');
+            const setupForm = document.getElementById('setup-form');
+
+            const player1NameInput = document.getElementById('player1-name');
+            const player2NameInput = document.getElementById('player2-name');
+            const pairCountSelect = document.getElementById('pair-count');
+            const imageUploadInput = document.getElementById('image-upload');
+
+            const name1Display = document.getElementById('name1');
+            const name2Display = document.getElementById('name2');
+            const playerTurnDisplay = document.getElementById('player-turn');
+            const score1Display = document.getElementById('score1');
+            const score2Display = document.getElementById('score2');
+            const gameBoard = document.getElementById('game-board');
+
+            const effectMessage = document.getElementById('effect-message');
+            const endGameModal = document.getElementById('end-game-modal');
+            const endGameTitle = document.getElementById('end-game-title');
+            const finalScoreDisplay = document.getElementById('final-score');
+            const restartButton = document.getElementById('restart-button');
+
+            let allImagePaths = [];
+            let cards = [];
+            let hasFlippedCard = false;
+            let lockBoard = false;
+            let firstCard, secondCard;
+            let currentPlayer = 1;
+            let score1 = 0;
+            let score2 = 0;
+            let matchesFound = 0;
+            let totalPairs = 0;
+            let player1Name, player2Name;
+            
+            let consecutiveMatches = 0;
+            let lastMatchPlayer = 0;
+
+            function shuffle(array) {
+                return array.sort(() => Math.random() - 0.5);
+            }
+
+            setupForm.addEventListener('submit', async (event) => {
+                event.preventDefault();
+
+                player1Name = player1NameInput.value || 'Spieler 1';
+                player2Name = player2NameInput.value || 'Spieler 2';
+                totalPairs = parseInt(pairCountSelect.value);
+                const files = imageUploadInput.files;
+
+                if (files.length !== totalPairs) {
+                    alert(`Bitte lade genau ${totalPairs} Bilder hoch, um das Spiel zu starten.`);
+                    return;
+                }
+
+                const formData = new FormData();
+                for (const file of files) {
+                    formData.append('memoryImages', file);
+                }
+
+                try {
+                    const response = await fetch('/upload', {
+                        method: 'POST',
+                        body: formData,
+                    });
+
+                    if (!response.ok) {
+                        throw new Error('Fehler beim Hochladen der Bilder');
+                    }
+
+                    const data = await response.json();
+                    allImagePaths = data.imagePaths;
+                    
+                    setupContainer.style.display = 'none';
+                    gameContainer.style.display = 'flex';
+                    name1Display.textContent = player1Name;
+                    name2Display.textContent = player2Name;
+                    startGame();
+
+                } catch (error) {
+                    console.error('Fehler:', error);
+                    alert('Ein Fehler ist beim Hochladen aufgetreten. Bitte versuche es erneut.');
+                }
+            });
+
+            function startGame() {
+                resetGame();
+                createBoard();
+                playerTurnDisplay.textContent = `${player1Name} ist an der Reihe.`;
+            }
+
+            function createBoard() {
+                const selectedImages = allImagePaths;
+                const cardImages = [...selectedImages, ...selectedImages];
+                const shuffledCards = shuffle(cardImages);
+
+                let columns;
+                if (totalPairs <= 8) columns = 4;
+                else if (totalPairs <= 16) columns = 6;
+                else columns = 8;
+                
+                gameBoard.style.gridTemplateColumns = `repeat(${columns}, 1fr)`;
+
+                gameBoard.innerHTML = '';
+                shuffledCards.forEach(imagePath => {
+                    const card = document.createElement('div');
+                    card.classList.add('memory-card');
+                    card.dataset.image = imagePath;
+                    card.addEventListener('click', flipCard);
+
+                    const cardBack = document.createElement('div');
+                    cardBack.classList.add('card-face', 'card-back');
+
+                    const cardFront = document.createElement('div');
+                    cardFront.classList.add('card-face', 'card-front');
+                    cardFront.style.backgroundImage = `url(${imagePath})`;
+
+                    card.appendChild(cardBack);
+                    card.appendChild(cardFront);
+                    gameBoard.appendChild(card);
+                    cards.push(card);
+                });
+            }
+
+            function flipCard() {
+                if (lockBoard) return;
+                if (this === firstCard) return;
+                if (this.classList.contains('flipped')) return;
+
+                this.classList.add('flipped');
+
+                if (!hasFlippedCard) {
+                    hasFlippedCard = true;
+                    firstCard = this;
+                } else {
+                    hasFlippedCard = false;
+                    secondCard = this;
+                    checkForMatch();
+                }
+            }
+
+            function checkForMatch() {
+                let isMatch = firstCard.dataset.image === secondCard.dataset.image;
+                isMatch ? disableCards() : unflipCards();
+            }
+
+            function disableCards() {
+                firstCard.removeEventListener('click', flipCard);
+                secondCard.removeEventListener('click', flipCard);
+                matchesFound++;
+
+                if (currentPlayer === lastMatchPlayer) {
+                    consecutiveMatches++;
+                } else {
+                    consecutiveMatches = 1;
+                }
+                lastMatchPlayer = currentPlayer;
+
+                showEffectMessage(consecutiveMatches);
+
+                if (currentPlayer === 1) {
+                    score1++;
+                    score1Display.textContent = score1;
+                } else {
+                    score2++;
+                    score2Display.textContent = score2;
+                }
+                
+                if (matchesFound === totalPairs) {
+                    setTimeout(endGame, 1000);
+                    return;
+                }
+
+                resetBoard();
+            }
+
+            function unflipCards() {
+                lockBoard = true;
+                setTimeout(() => {
+                    firstCard.classList.remove('flipped');
+                    secondCard.classList.remove('flipped');
+                    resetBoard();
+                    switchPlayer();
+                }, 1500);
+                consecutiveMatches = 0;
+            }
+
+            function resetBoard() {
+                [hasFlippedCard, lockBoard] = [false, false];
+                [firstCard, secondCard] = [null, null];
+            }
+
+            function switchPlayer() {
+                currentPlayer = currentPlayer === 1 ? 2 : 1;
+                const currentName = currentPlayer === 1 ? player1Name : player2Name;
+                playerTurnDisplay.textContent = `${currentName} ist an der Reihe.`;
+            }
+            
+            function showEffectMessage(count) {
+                let messageText;
+                let styleClass = '';
+                
+                const phrases = {
+                    1: ['Sehr gut!', 'Treffer!', 'Stark!'],
+                    2: ['PERFEKT!', 'GENIAL!', 'FANTASTISCH!'],
+                    3: ['WOW!', 'ÜBERRAGEND!', 'UNGLAUBLICH!'],
+                    4: ['EXZELLENT!', 'MEISTERHAFT!', 'HERAUSRAGEND!'],
+                    5: ['ABSOLUT PERFEKT!', 'UNBESIEGBAR!', 'LEGENDÄR!']
+                };
+
+                if (count >= 1 && count <= 5) {
+                    const possiblePhrases = phrases[count];
+                    messageText = possiblePhrases[Math.floor(Math.random() * possiblePhrases.length)];
+                } else if (count > 5) {
+                    messageText = `KOMBO x${count}!`;
+                } else {
+                    return;
+                }
+
+                if (count === 2) {
+                    styleClass = 'rainbow';
+                } else if (count >= 3) {
+                    styleClass = 'golden';
+                }
+
+                effectMessage.textContent = messageText;
+                effectMessage.className = '';
+                effectMessage.classList.add('show');
+                if (styleClass) {
+                    effectMessage.classList.add(styleClass);
+                }
+
+                setTimeout(() => {
+                    effectMessage.classList.remove('show');
+                    if (styleClass) {
+                        effectMessage.classList.remove(styleClass);
+                    }
+                }, 1500);
+            }
+
+            function endGame() {
+                let winner;
+                if (score1 > score2) {
+                    winner = player1Name;
+                } else if (score2 > score1) {
+                    winner = player2Name;
+                } else {
+                    winner = 'Unentschieden';
+                }
+
+                const winnerText = (winner === 'Unentschieden') ? 'Unentschieden!' : `${winner} hat gewonnen!`;
+                endGameTitle.textContent = winnerText;
+                finalScoreDisplay.innerHTML = `${player1Name}: ${score1} Punkte<br>${player2Name}: ${score2} Punkte`;
+                
+                endGameModal.classList.add('show-modal');
+            }
+
+            function resetGame() {
+                [hasFlippedCard, lockBoard] = [false, false];
+                [firstCard, secondCard] = [null, null];
+                cards = [];
+                score1 = 0;
+                score2 = 0;
+                matchesFound = 0;
+                currentPlayer = 1;
+                
+                score1Display.textContent = '0';
+                score2Display.textContent = '0';
+                
+                gameBoard.innerHTML = '';
+                consecutiveMatches = 0;
+                lastMatchPlayer = 0;
+            }
+            
+            restartButton.addEventListener('click', () => {
+                endGameModal.classList.remove('show-modal');
+                setupContainer.style.display = 'block';
+                gameContainer.style.display = 'none';
+                
+                allImagePaths = [];
+            });
+        });
+    </script>
 </body>
 </html>
